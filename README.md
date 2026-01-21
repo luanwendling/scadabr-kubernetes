@@ -129,4 +129,3 @@ Uso educacional e de infraestrutura.
 ScadaBR é open-source mantido por seus autores.
 
 # scadabr-kubernetes
-# scadabr-kubernetes

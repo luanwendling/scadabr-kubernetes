@@ -24,3 +24,4 @@ data:
     performance_schema = OFF
 
     datadir=/var/lib/mysql/data
+
