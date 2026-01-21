@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: scadabr-env
+  namespace: scada-minidash
+data:
+  env.properties: |
+    # Banco
+    #db.type=mysql
+    #db.url=jdbc:mysql://mysql:3306/scadabr?useSSL=false&useUnicode=true&characterEncoding=UTF-8
+    #db.username=scadabr
+    #db.password=scadabr
+    
+  
+    db.type=derby
+    db.url=~/db/scadabrDB
+    db.username=
+    db.password=
+    
+    db.pool.maxActive=10
+    db.pool.maxIdle=5
+    db.pool.minIdle=2
+    db.pool.maxWait=10000
+
+    # Performance
+    main.maxthreadlimit=300
+    js.optimizationlevel=0
+
+    # API
+    api.authentication=disabled
+    api.username=admin
+    api.password=admin
+
+    # Idioma
+    lang=en
+    locale=en
+
+    mango.views.useradd=false
+
