@@ -1,0 +1,80 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: mysql-and-node-alerts
+  namespace: monitoring
+  labels:
+    release: prometheus
+spec:
+  groups:
+
+  # -----------------------------
+  # MySQL CPU
+  # -----------------------------
+  - name: mysql-cpu.rules
+    rules:
+    - alert: MySQLHighCPUUsage
+      expr: |
+        (
+          sum by (pod) (
+            rate(container_cpu_usage_seconds_total{
+              namespace="scada-minidash",
+              pod="mysql-0",
+              container!="",
+              image!=""
+            }[5m])
+          )
+          /
+          sum by (pod) (
+            kube_pod_container_resource_limits_cpu_cores{
+              namespace="scada-minidash",
+              pod="mysql-0"
+            }
+          )
+        ) > 0.85
+      for: 10m
+      labels:
+        severity: warning
+      annotations:
+        summary: "MySQL com uso alto de CPU"
+        description: "O pod mysql-0 está usando mais de 85% do CPU limit por mais de 10 minutos."
+
+  # -----------------------------
+  # MySQL Pod Restart
+  # -----------------------------
+  - name: mysql-restart.rules
+    rules:
+    - alert: MySQLPodRestarted
+      expr: |
+        increase(kube_pod_container_status_restarts_total{
+          namespace="scada-minidash",
+          pod="mysql-0"
+        }[5m]) > 0
+      for: 1m
+      labels:
+        severity: critical
+      annotations:
+        summary: "MySQL reiniciou"
+        description: "O pod mysql-0 reiniciou nos últimos 5 minutos. Verifique OOM, disco ou falha de processo."
+
+  # -----------------------------
+  # Node Disk Usage
+  # -----------------------------
+  - name: node-disk.rules
+    rules:
+    - alert: NodeDiskUsageHigh
+      expr: |
+        (
+          node_filesystem_size_bytes{fstype!~"tmpfs|overlay"}
+          - node_filesystem_avail_bytes{fstype!~"tmpfs|overlay"}
+        )
+        /
+        node_filesystem_size_bytes{fstype!~"tmpfs|overlay"}
+        > 0.90
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Disco do node acima de 90%"
+        description: "Um node do cluster está com mais de 90% do disco utilizado. Risco de eviction e falhas."
+

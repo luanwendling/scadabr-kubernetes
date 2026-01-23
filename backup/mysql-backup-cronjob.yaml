@@ -1,0 +1,37 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: mysql-backup
+  namespace: scada-minidash
+spec:
+  schedule: "0 2 * * *"
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: mysql-backup
+              image: mysql:5.7
+              command:
+                - sh
+                - -c
+                - |
+                  mysqldump \
+                    -h mysql \
+                    -u scadabr \
+                    -psc adabr \
+                    --single-transaction \
+                    --routines \
+                    --triggers \
+                    scadabr > /backup/scadabr_$(date +%F_%H-%M).sql
+              volumeMounts:
+                - name: backup
+                  mountPath: /backup
+          volumes:
+            - name: backup
+              persistentVolumeClaim:
+                claimName: mysql-backup-pvc
+

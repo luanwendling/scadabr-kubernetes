@@ -6,16 +6,16 @@ metadata:
 data:
   env.properties: |
     # Banco
-    #db.type=mysql
-    #db.url=jdbc:mysql://mysql:3306/scadabr?useSSL=false&useUnicode=true&characterEncoding=UTF-8
-    #db.username=scadabr
-    #db.password=scadabr
+    db.type=mysql
+    db.url=jdbc:mysql://mysql:3306/scadabr?useSSL=false&useUnicode=true&characterEncoding=UTF-8
+    db.username=scadabr
+    db.password=scadabr
     
   
-    db.type=derby
-    db.url=~/db/scadabrDB
-    db.username=
-    db.password=
+    #db.type=derby
+    #db.url=~/db/scadabrDB
+    #db.username=
+    #db.password=
     
     db.pool.maxActive=10
     db.pool.maxIdle=5

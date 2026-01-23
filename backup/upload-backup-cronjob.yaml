@@ -1,0 +1,35 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: scadabr-uploads-backup
+  namespace: scada-minidash
+spec:
+  schedule: "0 3 * * *"
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: uploads-backup
+              image: busybox
+              command:
+                - sh
+                - -c
+                - |
+                  tar czf /backup/uploads_$(date +%F_%H-%M).tar.gz /uploads
+              volumeMounts:
+                - name: uploads
+                  mountPath: /uploads
+                - name: backup
+                  mountPath: /backup
+          volumes:
+            - name: uploads
+              persistentVolumeClaim:
+                claimName: scadabr-uploads
+            - name: backup
+              persistentVolumeClaim:
+                claimName: uploads-backup-pvc
+
